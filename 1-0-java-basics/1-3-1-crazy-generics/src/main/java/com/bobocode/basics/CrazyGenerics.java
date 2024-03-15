@@ -1,16 +1,12 @@
 package com.bobocode.basics;
 
 import com.bobocode.basics.util.BaseEntity;
-import com.bobocode.data.Accounts;
 import com.bobocode.util.ExerciseNotCompletedException;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.IntUnaryOperator;
+import java.util.*;
+import java.util.function.Predicate;
 
 import static java.lang.Integer.signum;
 
@@ -181,8 +177,8 @@ public class CrazyGenerics {
          * @param validationPredicate criteria for validation
          * @return true if all entities fit validation criteria
          */
-        public static boolean isValidCollection() {
-            throw new ExerciseNotCompletedException(); // todo: add method parameters and implement the logic
+        public static <E extends BaseEntity> boolean isValidCollection(Collection<E> entities, Predicate<E> validationPredicate) {
+            return entities.stream().allMatch(validationPredicate);
         }
 
         /**
@@ -195,8 +191,8 @@ public class CrazyGenerics {
          * @param <T>          entity type
          * @return true if entities list contains target entity more than once
          */
-        public static boolean hasDuplicates() {
-            throw new ExerciseNotCompletedException(); // todo: update method signature and implement it
+        public static <T extends BaseEntity> boolean hasDuplicates(Collection<T> entities, T targetEntity) {
+            return entities.stream().anyMatch(item -> item.getUuid() == targetEntity.getUuid());
         }
 
         /**
@@ -208,7 +204,19 @@ public class CrazyGenerics {
          * @param <T>        type of elements
          * @return optional max value
          */
-        // todo: create a method and implement its logic manually without using util method from JDK
+        public static <T extends BaseEntity & Comparable<? super T>> Optional<T> findMax(Iterable<T> elements, Comparator<T> comparator) {
+            T max = null;
+            for (T element : elements) {
+                if (max == null) {
+                    max = element;
+                } else {
+                    if (comparator.compare(max, element) < 0) {
+                        max = element;
+                    }
+                }
+            }
+            return Optional.ofNullable(max);
+        }
 
         /**
          * findMostRecentlyCreatedEntity is a generic util method that accepts a collection of entities and returns the
@@ -222,6 +230,7 @@ public class CrazyGenerics {
          * @param <T>      entity type
          * @return an entity from the given collection that has the max createdOn value
          */
+        public static <T extends BaseEntity> T findMostRecentlyCreatedEntity(Iterable<T> elements, Comparator<T> comparator) {
         // todo: create a method according to JavaDoc and implement it using previous method
 
         /**
