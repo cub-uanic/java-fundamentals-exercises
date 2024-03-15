@@ -1,6 +1,7 @@
 package com.bobocode.basics;
 
 import com.bobocode.basics.util.BaseEntity;
+import com.bobocode.data.Accounts;
 import com.bobocode.util.ExerciseNotCompletedException;
 import lombok.Data;
 
@@ -9,6 +10,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntUnaryOperator;
+
+import static java.lang.Integer.signum;
 
 /**
  * {@link CrazyGenerics} is an exercise class. It consists of classes, interfaces and methods that should be updated
@@ -33,8 +37,8 @@ public class CrazyGenerics {
      * @param <T> – value type
      */
     @Data
-    public static class Sourced { // todo: refactor class to introduce type parameter and make value generic
-        private Object value;
+    public static class Sourced<T> {
+        private T value;
         private String source;
     }
 
@@ -45,11 +49,10 @@ public class CrazyGenerics {
      * @param <T> – actual, min and max type
      */
     @Data
-    public static class Limited {
-        // todo: refactor class to introduce type param bounded by number and make fields generic numbers
-        private final Object actual;
-        private final Object min;
-        private final Object max;
+    public static class Limited<T extends Number> {
+        private final T actual;
+        private final T min;
+        private final T max;
     }
 
     /**
@@ -59,8 +62,8 @@ public class CrazyGenerics {
      * @param <T> – source object type
      * @param <R> - converted result type
      */
-    public interface Converter { // todo: introduce type parameters
-        // todo: add convert method
+    public interface Converter<T, R> {
+        R convert(T param);
     }
 
     /**
@@ -70,10 +73,10 @@ public class CrazyGenerics {
      *
      * @param <T> – value type
      */
-    public static class MaxHolder { // todo: refactor class to make it generic
-        private Object max;
+    public static class MaxHolder<T extends Comparable<T>> {
+        private T max;
 
-        public MaxHolder(Object max) {
+        public MaxHolder(T max) {
             this.max = max;
         }
 
@@ -82,11 +85,13 @@ public class CrazyGenerics {
          *
          * @param val a new value
          */
-        public void put(Object val) {
-            throw new ExerciseNotCompletedException(); // todo: update parameter and implement the method
+        public void put(T val) {
+            if (max.compareTo(val) < 0) {
+                max = val;
+            }
         }
 
-        public Object getMax() {
+        public T getMax() {
             return max;
         }
     }
@@ -97,8 +102,8 @@ public class CrazyGenerics {
      *
      * @param <T> – the type of objects that can be processed
      */
-    interface StrictProcessor { // todo: make it generic
-        void process(Object obj);
+    interface StrictProcessor<T extends Serializable & Comparable<T>> {
+        void process(T obj);
     }
 
     /**
@@ -108,10 +113,10 @@ public class CrazyGenerics {
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      * @param <C> – a type of any collection
      */
-    interface CollectionRepository { // todo: update interface according to the javadoc
-        void save(Object entity);
+    interface CollectionRepository<T extends BaseEntity, C extends Collection<T>> {
+        void save(T entity);
 
-        Collection<Object> getEntityCollection();
+        C getEntityCollection();
     }
 
     /**
@@ -120,7 +125,7 @@ public class CrazyGenerics {
      *
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      */
-    interface ListRepository { // todo: update interface according to the javadoc
+    interface ListRepository<T extends BaseEntity> extends CollectionRepository<T, List<T>> {
     }
 
     /**
@@ -133,22 +138,25 @@ public class CrazyGenerics {
      *
      * @param <E> a type of collection elements
      */
-    interface ComparableCollection { // todo: refactor it to make generic and provide a default impl of compareTo
+    interface ComparableCollection<E> extends Collection<E>, Comparable<Collection<?>> {
+        @Override
+        default int compareTo(Collection<?> o) {
+            return signum(this.size() - o.size());
+        }
     }
 
     /**
-     * {@link CollectionUtil} is an util class that provides various generic helper methods.
+     * {@link CollectionUtil} is a util class that provides various generic helper methods.
      */
     static class CollectionUtil {
         static final Comparator<BaseEntity> CREATED_ON_COMPARATOR = Comparator.comparing(BaseEntity::getCreatedOn);
 
         /**
-         * An util method that allows to print a dashed list of elements
+         * A util method that allows to print a dashed list of elements
          *
          * @param list
          */
-        public static void print(List<Integer> list) {
-            // todo: refactor it so the list of any type can be printed, not only integers
+        public static void print(List<?> list) {
             list.forEach(element -> System.out.println(" – " + element));
         }
 
@@ -160,8 +168,8 @@ public class CrazyGenerics {
          * @param entities provided collection of entities
          * @return true if at least one of the elements has null id
          */
-        public static boolean hasNewEntities(Collection<BaseEntity> entities) {
-            throw new ExerciseNotCompletedException(); // todo: refactor parameter and implement method
+        public static boolean hasNewEntities(Collection<? extends BaseEntity> entities) {
+            return entities.stream().anyMatch(item -> item.getUuid() == null);
         }
 
         /**
