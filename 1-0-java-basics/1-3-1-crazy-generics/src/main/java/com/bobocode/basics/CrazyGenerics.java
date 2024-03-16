@@ -179,7 +179,8 @@ public class CrazyGenerics {
          */
         public static boolean isValidCollection(Collection<? extends BaseEntity> entities,
                                                 Predicate<? super BaseEntity> validationPredicate) {
-            return entities.stream().allMatch(validationPredicate);
+            return entities.stream()
+                    .allMatch(validationPredicate);
         }
 
         /**
@@ -193,7 +194,9 @@ public class CrazyGenerics {
          * @return true if entities list contains target entity more than once
          */
         public static <T extends BaseEntity> boolean hasDuplicates(Collection<T> entities, T targetEntity) {
-            return entities.stream().anyMatch(item -> item.getUuid() == targetEntity.getUuid());
+            return entities.stream()
+                    .filter(item -> item.getUuid().equals(targetEntity.getUuid()))
+                    .count() > 1;
         }
 
         /**
@@ -205,7 +208,7 @@ public class CrazyGenerics {
          * @param <T>        type of elements
          * @return optional max value
          */
-        public static <T extends BaseEntity> Optional<T> findMax(Iterable<T> elements, Comparator<? super T> comparator) {
+        public static <T> Optional<T> findMax(Iterable<? extends T> elements, Comparator<? super T> comparator) {
             T max = null;
             for (T element : elements) {
                 if (max == null) {
