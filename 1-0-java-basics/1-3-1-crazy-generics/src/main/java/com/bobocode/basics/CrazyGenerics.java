@@ -1,14 +1,11 @@
 package com.bobocode.basics;
 
 import com.bobocode.basics.util.BaseEntity;
-import com.bobocode.util.ExerciseNotCompletedException;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Predicate;
-
-import static java.lang.Integer.signum;
 
 /**
  * {@link CrazyGenerics} is an exercise class. It consists of classes, interfaces and methods that should be updated
@@ -69,7 +66,7 @@ public class CrazyGenerics {
      *
      * @param <T> – value type
      */
-    public static class MaxHolder<T extends Comparable<? super T>> {
+    public static class MaxHolder<T extends Comparable<? super T>> { // todo: refactor class to make it generic
         private T max;
 
         public MaxHolder(T max) {
@@ -98,7 +95,7 @@ public class CrazyGenerics {
      *
      * @param <T> – the type of objects that can be processed
      */
-    interface StrictProcessor<T extends Serializable & Comparable<? super T>> {
+    interface StrictProcessor<T extends Serializable & Comparable<? super T>> { // todo: make it generic
         void process(T obj);
     }
 
@@ -109,7 +106,7 @@ public class CrazyGenerics {
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      * @param <C> – a type of any collection
      */
-    interface CollectionRepository<T extends BaseEntity, C extends Collection<T>> {
+    interface CollectionRepository<T extends BaseEntity, C extends Collection<T>> { // todo: update interface according to the javadoc
         void save(T entity);
 
         C getEntityCollection();
@@ -121,7 +118,7 @@ public class CrazyGenerics {
      *
      * @param <T> – a type of the entity that should be a subclass of {@link BaseEntity}
      */
-    interface ListRepository<T extends BaseEntity> extends CollectionRepository<T, List<T>> {
+    interface ListRepository<T extends BaseEntity> extends CollectionRepository<T, List<T>> { // todo: update interface according to the javadoc
     }
 
     /**
@@ -137,18 +134,18 @@ public class CrazyGenerics {
     interface ComparableCollection<E> extends Collection<E>, Comparable<Collection<?>> {
         @Override
         default int compareTo(Collection<?> o) {
-            return signum(this.size() - o.size());
+            return Integer.signum(this.size() - o.size());
         }
     }
 
     /**
-     * {@link CollectionUtil} is a util class that provides various generic helper methods.
+     * {@link CollectionUtil} is An util class that provides various generic helper methods.
      */
     static class CollectionUtil {
         static final Comparator<BaseEntity> CREATED_ON_COMPARATOR = Comparator.comparing(BaseEntity::getCreatedOn);
 
         /**
-         * A util method that allows to print a dashed list of elements
+         * An util method that allows to print a dashed list of elements
          *
          * @param list
          */
@@ -165,7 +162,8 @@ public class CrazyGenerics {
          * @return true if at least one of the elements has null id
          */
         public static boolean hasNewEntities(Collection<? extends BaseEntity> entities) {
-            return entities.stream().anyMatch(item -> item.getUuid() == null);
+            return entities.stream()
+                    .anyMatch(e -> e.getUuid() == null);
         }
 
         /**
@@ -195,7 +193,7 @@ public class CrazyGenerics {
          */
         public static <T extends BaseEntity> boolean hasDuplicates(Collection<T> entities, T targetEntity) {
             return entities.stream()
-                    .filter(item -> item.getUuid().equals(targetEntity.getUuid()))
+                    .filter(e -> e.getUuid().equals(targetEntity.getUuid()))
                     .count() > 1;
         }
 
@@ -235,11 +233,12 @@ public class CrazyGenerics {
          * @return an entity from the given collection that has the max createdOn value
          */
         public static <T extends BaseEntity> T findMostRecentlyCreatedEntity(Collection<T> entities) {
-            return findMax(entities, CREATED_ON_COMPARATOR).orElseThrow(NoSuchElementException::new);
+            return findMax(entities, CREATED_ON_COMPARATOR)
+                    .orElseThrow();
         }
 
         /**
-         * A util method that allows to swap two elements of any list. It changes the list so the element with the index
+         * An util method that allows to swap two elements of any list. It changes the list so the element with the index
          * i will be located on index j, and the element with index j, will be located on the index i.
          * Please note that in order to make it convenient and simple, it DOES NOT declare any type parameter.
          *
