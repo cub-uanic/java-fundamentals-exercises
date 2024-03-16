@@ -69,7 +69,7 @@ public class CrazyGenerics {
      *
      * @param <T> – value type
      */
-    public static class MaxHolder<T extends Comparable<T>> {
+    public static class MaxHolder<T extends Comparable<? super T>> {
         private T max;
 
         public MaxHolder(T max) {
@@ -98,7 +98,7 @@ public class CrazyGenerics {
      *
      * @param <T> – the type of objects that can be processed
      */
-    interface StrictProcessor<T extends Serializable & Comparable<T>> {
+    interface StrictProcessor<T extends Serializable & Comparable<? super T>> {
         void process(T obj);
     }
 
@@ -177,7 +177,8 @@ public class CrazyGenerics {
          * @param validationPredicate criteria for validation
          * @return true if all entities fit validation criteria
          */
-        public static <E extends BaseEntity> boolean isValidCollection(Collection<E> entities, Predicate<E> validationPredicate) {
+        public static boolean isValidCollection(Collection<? extends BaseEntity> entities,
+                                                Predicate<? super BaseEntity> validationPredicate) {
             return entities.stream().allMatch(validationPredicate);
         }
 
@@ -204,7 +205,7 @@ public class CrazyGenerics {
          * @param <T>        type of elements
          * @return optional max value
          */
-        public static <T extends BaseEntity & Comparable<? super T>> Optional<T> findMax(Iterable<T> elements, Comparator<T> comparator) {
+        public static <T extends BaseEntity> Optional<T> findMax(Iterable<T> elements, Comparator<? super T> comparator) {
             T max = null;
             for (T element : elements) {
                 if (max == null) {
@@ -230,11 +231,12 @@ public class CrazyGenerics {
          * @param <T>      entity type
          * @return an entity from the given collection that has the max createdOn value
          */
-        public static <T extends BaseEntity> T findMostRecentlyCreatedEntity(Iterable<T> elements, Comparator<T> comparator) {
-        // todo: create a method according to JavaDoc and implement it using previous method
+        public static <T extends BaseEntity> T findMostRecentlyCreatedEntity(Collection<T> entities) {
+            return findMax(entities, CREATED_ON_COMPARATOR).orElseThrow(NoSuchElementException::new);
+        }
 
         /**
-         * An util method that allows to swap two elements of any list. It changes the list so the element with the index
+         * A util method that allows to swap two elements of any list. It changes the list so the element with the index
          * i will be located on index j, and the element with index j, will be located on the index i.
          * Please note that in order to make it convenient and simple, it DOES NOT declare any type parameter.
          *
@@ -245,7 +247,8 @@ public class CrazyGenerics {
         public static void swap(List<?> elements, int i, int j) {
             Objects.checkIndex(i, elements.size());
             Objects.checkIndex(j, elements.size());
-            throw new ExerciseNotCompletedException(); // todo: complete method implementation 
+            List e = elements;
+            e.set(j, e.set(i, e.get(j)));
         }
 
     }
