@@ -391,7 +391,7 @@ class HeterogeneousMaxHolderTest {
 
     @Test
     @Order(31)
-    @DisplayName("getMax returns value when it exists")
+    @DisplayName("getMax returns value when it NOT exists")
     void getMaxReturnsNullWhenNoValueByGivenTypeExists() {
         var returnedValue = callGetMax(String.class);
 
