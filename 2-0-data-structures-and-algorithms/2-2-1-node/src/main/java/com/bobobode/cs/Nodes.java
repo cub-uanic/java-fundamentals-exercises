@@ -1,6 +1,7 @@
 package com.bobobode.cs;
 
-import com.bobocode.util.ExerciseNotCompletedException;
+import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * A class that consists of static methods only and provides util methods for {@link Node}.
@@ -22,7 +23,7 @@ public class Nodes {
      * @return a new instance of {@link Node}
      */
     public static <T> Node<T> create(T element) {
-        throw new ExerciseNotCompletedException(); // todo:
+        return new Node<>(element);
     }
 
     /**
@@ -33,7 +34,7 @@ public class Nodes {
      * @param <T>    a genetic type
      */
     public static <T> void link(Node<T> first, Node<T> second) {
-        throw new ExerciseNotCompletedException(); // todo:
+        first.next = second;
     }
 
     /**
@@ -46,7 +47,7 @@ public class Nodes {
      * @return a reference to a first node created based on firstElement
      */
     public static <T> Node<T> pairOf(T firstElement, T secondElement) {
-        throw new ExerciseNotCompletedException(); // todo:
+        return chainOf(firstElement, secondElement);
     }
 
     /**
@@ -55,12 +56,12 @@ public class Nodes {
      * a reference to the first one.
      *
      * @param firstElement  any element of type T
-     * @param secondElement any element of type T
+     * @param secondElement any element of type Tg
      * @param <T>           generic type T
      * @return a reference to the first node
      */
     public static <T> Node<T> closedPairOf(T firstElement, T secondElement) {
-        throw new ExerciseNotCompletedException(); // todo:
+        return circleOf(firstElement, secondElement);
     }
 
     /**
@@ -72,7 +73,7 @@ public class Nodes {
      * @return a reference to the first element of the chain
      */
     public static <T> Node<T> chainOf(T... elements) {
-        throw new ExerciseNotCompletedException(); // todo:
+        return buildNodesList(elements, NodesListType.CHAIN);
     }
 
     /**
@@ -85,6 +86,27 @@ public class Nodes {
      * @return a reference to the first element of the chain
      */
     public static <T> Node<T> circleOf(T... elements) {
-        throw new ExerciseNotCompletedException(); // todo:
+        return buildNodesList(elements, NodesListType.CIRCLE);
+    }
+
+    private static <T> Node<T> buildNodesList(T[] elements, NodesListType closeLoop) {
+        Node<T> root = null;
+        Node<T> current = null;
+
+        Iterator<T> itr = Arrays.stream(elements).iterator();
+        if (itr.hasNext()) {
+            root = current = new Node<>(itr.next());
+
+            while (itr.hasNext()) {
+                current.next = new Node<>(itr.next());
+                current = current.next;
+            }
+
+            if (closeLoop.equals(NodesListType.CIRCLE)) {
+                current.next = root;
+            }
+        }
+
+        return root;
     }
 }

@@ -10,4 +10,15 @@ package com.bobobode.cs;
  */
 public class Node<T> {
     // todo:
+    T value;
+    Node<T> next;
+
+    Node(T element) {
+        value = element;
+    }
+
+    Node(T element, Node<T> node) {
+        value = element;
+        next = node;
+    }
 }
