@@ -1,5 +1,7 @@
 package com.bobocode.basics;
 
+import com.google.common.collect.Comparators;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,8 +21,8 @@ import java.util.Map;
 public class HeterogeneousMaxHolder {
 
     // see https://www.youtube.com/watch?v=V1vQf4qyMXg&t=2433s
-    
-    Map<Class<?>, Object> maxHolder = new HashMap<>();
+
+    private final Map<Class<?>, Object> maxHolder = new HashMap<>();
     /**
      * A method put stores a provided value by its type, if the value is greater than the current maximum. In other words, the logic
      * of this method makes sure that only max value is stored and everything else is ignored.
@@ -54,7 +56,11 @@ public class HeterogeneousMaxHolder {
      */
     // todo: implement a method according to javadoc
     public <T> T put(Class<T> key, T value, Comparator<? super T> comparator) {
-        return null;
+        T current = getMax(key);
+        if (Comparator.nullsFirst(comparator).compare(value, current) > 0 ) {
+            return key.cast(maxHolder.put(key, value));
+        }
+        return value;
     }
 
     /**
@@ -66,6 +72,6 @@ public class HeterogeneousMaxHolder {
      */
     // todo: implement a method according to javadoc
     public <T> T getMax(Class<T> key) {
-        return maxHolder.containsKey(key) ? key.cast(maxHolder.get(key)) : null;
+        return key.cast(maxHolder.get(key));
     }
 }
