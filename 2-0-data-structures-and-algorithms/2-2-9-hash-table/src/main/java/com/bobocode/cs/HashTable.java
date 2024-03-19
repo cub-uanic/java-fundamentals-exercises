@@ -28,8 +28,8 @@ import com.bobocode.util.ExerciseNotCompletedException;
  */
 public class HashTable<K, V> implements Map<K, V> {
     private static final int DEFAULT_CAPACITY = 8;
-    private int size = 0;
-    private Object[] table = new Object[DEFAULT_CAPACITY];
+    private int size;
+    private Node<K, V>[] table; //  = (Node<K, V>[]) new Object[DEFAULT_CAPACITY];
 
     private static class Node<K, V> {
         K key;
@@ -40,15 +40,24 @@ public class HashTable<K, V> implements Map<K, V> {
             this.key = key;
             this.value = value;
         }
-
-        private Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
+//
+//        private Node(K key, V value, Node<K, V> next) {
+//            this.key = key;
+//            this.value = value;
+//            this.next = next;
+//        }
     }
 
+    public HashTable() {
+        size = 0;
+        table = new Node[DEFAULT_CAPACITY];
+    }
 
+    public HashTable(int capacity) {
+        if (capacity < 1) throw new IllegalArgumentException();
+        size = 0;
+        table = new Node[capacity];
+    }
 
     /**
      * This method is a critical part of the hast table. The main idea is that having a key, you can calculate its index
@@ -65,7 +74,7 @@ public class HashTable<K, V> implements Map<K, V> {
      * @return array index of the given key
      */
     public static int calculateIndex(Object key, int tableCapacity) {
-        return key.hashCode() % tableCapacity;
+        return Math.abs(key.hashCode()) % tableCapacity;
     }
 
     /**
