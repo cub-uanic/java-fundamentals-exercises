@@ -520,6 +520,22 @@ public class LinkedListTest {
                 .isThrownBy(() -> getInternalElement(0));
     }
 
+    @Test
+    @Order(43)
+    void reserve() {
+        addInternalElements(25, 87, 45);
+
+        intList.reverse();
+
+        int firstElement = intList.get(0);
+        int secondElement = intList.get(1);
+        int thirdElement = intList.get(2);
+
+        assertThat(firstElement).isEqualTo(45);
+        assertThat(secondElement).isEqualTo(87);
+        assertThat(thirdElement).isEqualTo(25);
+    }
+
     @SneakyThrows
     private int getInternalElement(int index) {
 

@@ -224,4 +224,25 @@ public class LinkedList<T> implements List<T> {
         head = tail = null;
         size = 0;
     }
+
+    /**
+     * Reverses the internal structure of the list
+     */
+    public void reverse() {
+        if (size() < 2) return;
+
+        Node<T> temp = tail = head;
+        head = head.next;
+        tail.next = null;
+
+        while (head != null) {
+            Node<T> curr = head;
+            head = head.next;
+            curr.next = tail;
+            tail = curr;
+        }
+
+        head = tail;
+        tail = temp;
+    }
 }
